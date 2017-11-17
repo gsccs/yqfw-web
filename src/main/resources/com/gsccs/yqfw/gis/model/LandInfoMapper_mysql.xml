@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gsccs.yqfw.gis.dao.LandInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.gsccs.yqfw.gis.model.LandInfo" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="measure" property="measure" jdbcType="DECIMAL" />
+    <result column="state" property="state" jdbcType="VARCHAR" />
+    <result column="corpid" property="corpid" jdbcType="VARCHAR" />
+    <result column="classid" property="classid" jdbcType="VARCHAR" />
+    
+    <!-- 不保存数据库 -->
+    <result column="corpname" property="corpname" jdbcType="VARCHAR" />
+    <result column="classfy" property="classfy" jdbcType="VARCHAR" />
+    <result column="fillcolor" property="fillcolor" jdbcType="VARCHAR" />
+    <result column="linecolor" property="linecolor" jdbcType="VARCHAR" />
+    <result column="weight" property="weight" jdbcType="INTEGER" />
+    <result column="opacity" property="opacity" jdbcType="FLOAT" />
+  </resultMap>
+  
+  
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  
+  
+  <sql id="Base_Column_List" >
+    id, code, title, remark, measure, state, corpid,classid
+  </sql>
+  
+  
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.gsccs.yqfw.gis.model.LandInfoExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from yqfw_land_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  
+  
+  <select id="selectPageByExample" resultMap="BaseResultMap" parameterType="com.gsccs.yqfw.gis.model.LandInfoExample" >
+    SELECT aa.* 
+    FROM (
+    	SELECT DISTINCT a.*,b.title as corpname,c.title as classfy,c.linecolor as linecolor,c.fillcolor as fillcolor,c.weight as weight,c.opacity as opacity
+    	FROM yqfw_land_info a 
+    	LEFT JOIN yqfw_company b ON a.corpid = b.id
+    	LEFT JOIN yqfw_marker_factor c ON a.classid = c.id AND c.classfy='LAND'
+    ) aa
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    limit ${skip},${pageSize}
+  </select>
+  
+  
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from yqfw_land_info
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from yqfw_land_info
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  
+  
+  <delete id="deleteByExample" parameterType="com.gsccs.yqfw.gis.model.LandInfoExample" >
+    delete from yqfw_land_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  
+  
+  <insert id="insert" parameterType="com.gsccs.yqfw.gis.model.LandInfo" >
+    insert into yqfw_land_info (id, code, title, 
+      remark, measure, state, 
+      corpid,classid)
+    values (#{id,jdbcType=VARCHAR}, 
+    #{code,jdbcType=VARCHAR}, #{title,jdbcType=VARCHAR}, 
+      #{remark,jdbcType=VARCHAR}, 
+      #{measure,jdbcType=DECIMAL}, 
+      #{state,jdbcType=VARCHAR}, 
+      #{corpid,jdbcType=VARCHAR},
+      #{classid,jdbcType=VARCHAR})
+  </insert>
+  
+  
+  <insert id="insertSelective" parameterType="com.gsccs.yqfw.gis.model.LandInfo" >
+    insert into yqfw_land_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="code != null" >
+        code,
+      </if>
+      <if test="title != null" >
+        title,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+      <if test="measure != null" >
+        measure,
+      </if>
+      <if test="state != null" >
+        state,
+      </if>
+      <if test="corpid != null" >
+        corpid,
+      </if>
+      <if test="classid != null" >
+        classid,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null" >
+        #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="title != null" >
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="measure != null" >
+        #{measure,jdbcType=DECIMAL},
+      </if>
+      <if test="state != null" >
+        #{state,jdbcType=VARCHAR},
+      </if>
+      <if test="corpid != null" >
+        #{corpid,jdbcType=VARCHAR},
+      </if>
+      <if test="classid != null" >
+        #{classid,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  
+  <select id="countByExample" parameterType="com.gsccs.yqfw.gis.model.LandInfoExample" resultType="java.lang.Integer" >
+    select count(*) from yqfw_land_info
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update yqfw_land_info
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.code != null" >
+        code = #{record.code,jdbcType=VARCHAR},
+      </if>
+      <if test="record.title != null" >
+        title = #{record.title,jdbcType=VARCHAR},
+      </if>
+      <if test="record.remark != null" >
+        remark = #{record.remark,jdbcType=VARCHAR},
+      </if>
+      <if test="record.measure != null" >
+        measure = #{record.measure,jdbcType=DECIMAL},
+      </if>
+      <if test="record.state != null" >
+        state = #{record.state,jdbcType=VARCHAR},
+      </if>
+      <if test="record.corpid != null" >
+        corpid = #{record.corpid,jdbcType=VARCHAR},
+      </if>
+      <if test="record.classid != null" >
+        classid = #{record.classid,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  
+  
+  <update id="updateByExample" parameterType="map" >
+    update yqfw_land_info
+    set id = #{record.id,jdbcType=VARCHAR},
+      code = #{record.code,jdbcType=VARCHAR},
+      title = #{record.title,jdbcType=VARCHAR},
+      remark = #{record.remark,jdbcType=VARCHAR},
+      measure = #{record.measure,jdbcType=DECIMAL},
+      state = #{record.state,jdbcType=VARCHAR},
+      corpid = #{record.corpid,jdbcType=VARCHAR},
+      classid = #{record.classid,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  
+  <update id="updateByPrimaryKeySelective" parameterType="com.gsccs.yqfw.gis.model.LandInfo" >
+    update yqfw_land_info
+    <set >
+      <if test="code != null" >
+        code = #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="title != null" >
+        title = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="measure != null" >
+        measure = #{measure,jdbcType=DECIMAL},
+      </if>
+      <if test="state != null" >
+        state = #{state,jdbcType=VARCHAR},
+      </if>
+      <if test="corpid != null" >
+        corpid = #{corpid,jdbcType=VARCHAR},
+      </if>
+      <if test="classid != null" >
+        classid = #{classid,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  
+  
+  <update id="updateByPrimaryKey" parameterType="com.gsccs.yqfw.gis.model.LandInfo" >
+    update yqfw_land_info
+    set code = #{code,jdbcType=VARCHAR},
+      title = #{title,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR},
+      measure = #{measure,jdbcType=DECIMAL},
+      state = #{state,jdbcType=VARCHAR},
+      corpid = #{corpid,jdbcType=VARCHAR},
+      classid = #{classid,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  
+  
+</mapper>

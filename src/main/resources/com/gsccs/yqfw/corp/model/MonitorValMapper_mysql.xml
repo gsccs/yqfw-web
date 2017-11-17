@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gsccs.yqfw.corp.dao.MonitorValMapper" >
+  <resultMap id="BaseResultMap" type="com.gsccs.yqfw.corp.model.MonitorVal" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="type_id" property="typeId" jdbcType="VARCHAR" />
+    <result column="corp_id" property="corpId" jdbcType="VARCHAR" />
+    <result column="monitval" property="monitval" jdbcType="DECIMAL" />
+    <result column="addtime" property="addtime" jdbcType="TIMESTAMP" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    
+    <!-- 不保存数据库 -->
+    <result column="corpname" property="corpname" jdbcType="VARCHAR" />
+    <result column="typename" property="typename" jdbcType="VARCHAR" />
+    <result column="isover" property="isover" jdbcType="VARCHAR" />
+    <result column="unit" property="unit" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, type_id, corp_id, monitval, addtime, remark
+  </sql>
+  
+  
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.gsccs.yqfw.corp.model.MonitorValExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from yqfw_monit_vals
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  
+  
+  <select id="selectPageByExample" resultMap="BaseResultMap" parameterType="com.gsccs.yqfw.corp.model.MonitorValExample" >
+  <![CDATA[  
+  SELECT id, type_id, corp_id, monitval, addtime, remark,typename,corpname, isover,unit
+  FROM(  
+	  SELECT 
+	    aa.id, aa.type_id, corp_id, monitval, addtime, aa.remark, typename, corpname,unit,
+	    CASE
+		WHEN bb.rule='it' AND aa.monitval <= bb.threshold then '0'
+		WHEN bb.rule='gt' AND aa.monitval >= bb.threshold then '0'
+		ELSE '1'
+		END as isover
+	    FROM (SELECT a.*,b.title as typename,c.title as corpname,b.unit as unit
+				FROM 
+				yqfw_monit_vals a, 
+				yqfw_monit_type b,
+				yqfw_company c
+				WHERE  a.type_id = b.id
+                and a.corp_id = c.id
+                and b.state='1') aa 
+		LEFT JOIN yqfw_warn_rule bb
+		ON aa.type_id = bb.type_id 
+		AND bb.state = '1') cc]]>
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    limit ${skip},${pageSize}
+  </select>
+  
+  
+  
+  <select id="selectCorpMonitVals" resultMap="BaseResultMap" parameterType="java.lang.String" >
+  <![CDATA[  
+  	SELECT a.id,a.title as typename,a.unit,bb.monitval,bb.addtime,bb.remark,bb.isover 
+  	FROM yqfw_monit_type a
+	LEFT JOIN 
+	(	SELECT b.type_id,b.corp_id,monitval, max(addtime) as addtime, b.remark,
+		CASE
+			WHEN c.rule='it' AND b.monitval <= c.threshold then '0'
+			WHEN c.rule='gt' AND b.monitval >= c.threshold then '0'
+			ELSE '1'
+		END as isover
+		FROM yqfw_db.yqfw_monit_vals b
+		LEFT JOIN 
+		yqfw_warn_rule c
+		ON b.type_id = c.type_id
+		GROUP BY b.type_id,b.corp_id
+		HAVING b.corp_id=#{id,jdbcType=VARCHAR}
+	) bb
+	ON a.id = bb.type_id]]>
+  </select>
+  
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from yqfw_monit_vals
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from yqfw_monit_vals
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  
+  <delete id="deleteByExample" parameterType="com.gsccs.yqfw.corp.model.MonitorValExample" >
+    delete from yqfw_monit_vals
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  
+  
+  <insert id="insert" parameterType="com.gsccs.yqfw.corp.model.MonitorVal" >
+    insert into yqfw_monit_vals (id, type_id, corp_id, 
+      monitval, addtime, remark
+      )
+    values (#{id,jdbcType=VARCHAR}, #{typeId,jdbcType=VARCHAR}, #{corpId,jdbcType=VARCHAR}, 
+      #{monitval,jdbcType=DECIMAL}, #{addtime,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.gsccs.yqfw.corp.model.MonitorVal" >
+    <!--
+      WARNING - @mbggenerated
+      This element is automatically generated by MyBatis Generator, do not modify.
+      This element was generated on Wed Oct 21 11:39:56 CST 2015.
+    -->
+    insert into yqfw_monit_vals
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="typeId != null" >
+        type_id,
+      </if>
+      <if test="corpId != null" >
+        corp_id,
+      </if>
+      <if test="monitval != null" >
+        monitval,
+      </if>
+      <if test="addtime != null" >
+        addtime,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="typeId != null" >
+        #{typeId,jdbcType=VARCHAR},
+      </if>
+      <if test="corpId != null" >
+        #{corpId,jdbcType=VARCHAR},
+      </if>
+      <if test="monitval != null" >
+        #{monitval,jdbcType=DECIMAL},
+      </if>
+      <if test="addtime != null" >
+        #{addtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.gsccs.yqfw.corp.model.MonitorValExample" resultType="java.lang.Integer" >
+    <!--
+      WARNING - @mbggenerated
+      This element is automatically generated by MyBatis Generator, do not modify.
+      This element was generated on Wed Oct 21 11:39:56 CST 2015.
+    -->
+    select count(*) from yqfw_monit_vals
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  
+  
+  <update id="updateByExampleSelective" parameterType="map" >
+    update yqfw_monit_vals
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.typeId != null" >
+        type_id = #{record.typeId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.corpId != null" >
+        corp_id = #{record.corpId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.monitval != null" >
+        monitval = #{record.monitval,jdbcType=DECIMAL},
+      </if>
+      <if test="record.addtime != null" >
+        addtime = #{record.addtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.remark != null" >
+        remark = #{record.remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  
+  
+  <update id="updateByExample" parameterType="map" >
+    update yqfw_monit_vals
+    set id = #{record.id,jdbcType=VARCHAR},
+      type_id = #{record.typeId,jdbcType=VARCHAR},
+      corp_id = #{record.corpId,jdbcType=VARCHAR},
+      monitval = #{record.monitval,jdbcType=DECIMAL},
+      addtime = #{record.addtime,jdbcType=TIMESTAMP},
+      remark = #{record.remark,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.gsccs.yqfw.corp.model.MonitorVal" >
+    <!--
+      WARNING - @mbggenerated
+      This element is automatically generated by MyBatis Generator, do not modify.
+      This element was generated on Wed Oct 21 11:39:56 CST 2015.
+    -->
+    update yqfw_monit_vals
+    <set >
+      <if test="typeId != null" >
+        type_id = #{typeId,jdbcType=VARCHAR},
+      </if>
+      <if test="corpId != null" >
+        corp_id = #{corpId,jdbcType=VARCHAR},
+      </if>
+      <if test="monitval != null" >
+        monitval = #{monitval,jdbcType=DECIMAL},
+      </if>
+      <if test="addtime != null" >
+        addtime = #{addtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  
+  <update id="updateByPrimaryKey" parameterType="com.gsccs.yqfw.corp.model.MonitorVal" >
+    update yqfw_monit_vals
+    set type_id = #{typeId,jdbcType=VARCHAR},
+      corp_id = #{corpId,jdbcType=VARCHAR},
+      monitval = #{monitval,jdbcType=DECIMAL},
+      addtime = #{addtime,jdbcType=TIMESTAMP},
+      remark = #{remark,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  
+  
+  
+  <select id="selectOverData" resultMap="BaseResultMap" parameterType="com.gsccs.yqfw.corp.model.MonitorValExample" >
+  <![CDATA[  
+  SELECT id, type_id, corp_id, monitval, addtime, remark,typename,corpname, isover,unit
+  FROM(  
+	  SELECT 
+	    aa.id, aa.type_id, corp_id, monitval, addtime, aa.remark, typename, corpname,unit,
+	    CASE
+		WHEN bb.rule='it' AND aa.monitval <= bb.threshold then '0'
+		WHEN bb.rule='gt' AND aa.monitval >= bb.threshold then '0'
+		ELSE '1'
+		END as isover
+	    FROM (SELECT a.*,b.title as typename,c.title as corpname,b.unit as unit
+				FROM 
+				yqfw_monit_vals a, 
+				yqfw_monit_type b,
+				yqfw_company c
+				WHERE  a.type_id = b.id
+                and a.corp_id = c.id
+                and b.state='1') aa 
+		LEFT JOIN yqfw_warn_rule bb
+		ON aa.type_id = bb.type_id 
+		AND bb.state = '1') cc]]>
+	where isover = '0'
+    order by addtime desc
+    limit ${skip},${pageSize}
+  </select>
+</mapper>

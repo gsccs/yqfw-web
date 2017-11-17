@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gsccs.yqfw.corp.dao.CompanyMapper" >
+  <resultMap id="BaseResultMap" type="com.gsccs.yqfw.corp.model.Company" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="lng" property="lng" jdbcType="DECIMAL" />
+    <result column="lat" property="lat" jdbcType="DECIMAL" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="tel" property="tel" jdbcType="VARCHAR" />
+    <result column="leader" property="leader" jdbcType="VARCHAR" />
+    <result column="state" property="state" jdbcType="VARCHAR" />
+    <result column="classid" property="classid" jdbcType="VARCHAR" />
+    <result column="intime" property="intime" jdbcType="TIMESTAMP" />
+    <result column="newtime" property="newtime" jdbcType="TIMESTAMP" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="scaleid" property="scaleid" jdbcType="VARCHAR" />
+    <result column="logo" property="logo" jdbcType="VARCHAR" />
+    <!--  -->
+    <result column="classfy" property="classfy" jdbcType="VARCHAR" />
+    <result column="scalestr" property="scalestr" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, title, lng, lat, remark, tel, leader, state, classid,intime,newtime,address,scaleid,logo
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.gsccs.yqfw.corp.model.CompanyExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from yqfw_company
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  
+  <select id="selectPageByExample" resultMap="BaseResultMap" parameterType="com.gsccs.yqfw.corp.model.CompanyExample" >
+    SELECT aa.* FROM (
+    SELECT a.*, b.title as classfy , c.title as scalestr
+    FROM yqfw_company a 
+    LEFT JOIN yqfw_marker_factor b ON a.classid = b.id AND b.classfy='CORP'
+    LEFT JOIN yqfw_marker_factor c ON a.scaleid = c.id AND c.classfy='SCALE'
+    ) aa
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    limit ${skip},${pageSize}
+  </select>
+  
+  
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from yqfw_company
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from yqfw_company
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  
+  
+  <delete id="deleteByExample" parameterType="com.gsccs.yqfw.corp.model.CompanyExample" >
+    delete from yqfw_company
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.gsccs.yqfw.corp.model.Company" >
+    insert into yqfw_company (id, title, lng, 
+      lat, remark, tel, 
+      leader, state, classid,intime,newtime,address,scaleid,logo
+      )
+    values (#{id,jdbcType=VARCHAR}, #{title,jdbcType=VARCHAR}, 
+    #{lng,jdbcType=DECIMAL}, 
+      #{lat,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR}, 
+      #{tel,jdbcType=VARCHAR}, 
+      #{leader,jdbcType=VARCHAR}, 
+      #{state,jdbcType=VARCHAR}, 
+      #{classid,jdbcType=VARCHAR},
+      #{intime,jdbcType=TIMESTAMP},
+      #{newtime,jdbcType=TIMESTAMP},
+      #{address,jdbcType=VARCHAR},
+      #{scaleid,jdbcType=VARCHAR},
+      #{logo,jdbcType=VARCHAR}
+      )
+  </insert>
+  
+  
+  <select id="countByExample" parameterType="com.gsccs.yqfw.corp.model.CompanyExample" resultType="java.lang.Integer" >
+    select count(*) from yqfw_company
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  
+  <update id="updateByExample" parameterType="map" >
+    update yqfw_company
+    set id = #{record.id,jdbcType=VARCHAR},
+      title = #{record.title,jdbcType=VARCHAR},
+      lng = #{record.lng,jdbcType=DECIMAL},
+      lat = #{record.lat,jdbcType=DECIMAL},
+      remark = #{record.remark,jdbcType=VARCHAR},
+      tel = #{record.tel,jdbcType=VARCHAR},
+      leader = #{record.leader,jdbcType=VARCHAR},
+      state = #{record.state,jdbcType=VARCHAR},
+      classid = #{record.classid,jdbcType=VARCHAR},
+      intime = #{record.intime,jdbcType=TIMESTAMP},
+      newtime = #{record.newtime,jdbcType=TIMESTAMP},
+      address = #{record.address,jdbcType=VARCHAR},
+      scaleid = #{record.scaleid,jdbcType=VARCHAR},
+      logo = #{record.logo,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  
+  
+  <update id="updateByPrimaryKey" parameterType="com.gsccs.yqfw.corp.model.Company" >
+    update yqfw_company
+    set title = #{title,jdbcType=VARCHAR},
+      lng = #{lng,jdbcType=DECIMAL},
+      lat = #{lat,jdbcType=DECIMAL},
+      remark = #{remark,jdbcType=VARCHAR},
+      tel = #{tel,jdbcType=VARCHAR},
+      leader = #{leader,jdbcType=VARCHAR},
+      state = #{state,jdbcType=VARCHAR},
+      classid = #{classid,jdbcType=VARCHAR},
+      intime = #{intime,jdbcType=TIMESTAMP},
+      newtime = #{newtime,jdbcType=TIMESTAMP},
+      address = #{address,jdbcType=VARCHAR},
+      scaleid = #{scaleid,jdbcType=VARCHAR},
+      logo = #{logo,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

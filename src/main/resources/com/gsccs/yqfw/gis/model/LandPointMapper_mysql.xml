@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gsccs.yqfw.gis.dao.LandPointMapper" >
+  <resultMap id="BaseResultMap" type="com.gsccs.yqfw.gis.model.LandPoint" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="landid" property="landid" jdbcType="VARCHAR" />
+    <result column="lng" property="lng" jdbcType="DECIMAL" />
+    <result column="lat" property="lat" jdbcType="DECIMAL" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="ordernum" property="ordernum" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, landid, lng, lat, remark,ordernum
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.gsccs.yqfw.gis.model.LandPointExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from yqfw_land_point
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  
+  
+  <select id="selectPageByExample" resultMap="BaseResultMap" parameterType="com.gsccs.yqfw.gis.model.LandPointExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from yqfw_land_point
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    limit ${skip},${pageSize}
+  </select>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from yqfw_land_point
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from yqfw_land_point
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.gsccs.yqfw.gis.model.LandPointExample" >
+    delete from yqfw_land_point
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  
+  
+  <insert id="insert" parameterType="com.gsccs.yqfw.gis.model.LandPoint" >
+    insert into yqfw_land_point (id, landid, lng, 
+      lat, remark,ordernum)
+    values (#{id,jdbcType=VARCHAR}, #{landid,jdbcType=VARCHAR}, #{lng,jdbcType=DECIMAL}, 
+      #{lat,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR},
+      #{ordernum,jdbcType=INTEGER}
+      )
+  </insert>
+  
+  <select id="countByExample" parameterType="com.gsccs.yqfw.gis.model.LandPointExample" resultType="java.lang.Integer" >
+    select count(*) from yqfw_land_point
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  
+  <update id="updateByExample" parameterType="map" >
+    update yqfw_land_point
+    set id = #{record.id,jdbcType=VARCHAR},
+      landid = #{record.landid,jdbcType=VARCHAR},
+      lng = #{record.lng,jdbcType=DECIMAL},
+      lat = #{record.lat,jdbcType=DECIMAL},
+      remark = #{record.remark,jdbcType=VARCHAR},
+      ordernum = #{record.ordernum,jdbcType=INTEGER}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  
+  <update id="updateByPrimaryKey" parameterType="com.gsccs.yqfw.gis.model.LandPoint" >
+    update yqfw_land_point
+    set landid = #{landid,jdbcType=VARCHAR},
+      lng = #{lng,jdbcType=DECIMAL},
+      lat = #{lat,jdbcType=DECIMAL},
+      remark = #{remark,jdbcType=VARCHAR},
+      ordernum = #{ordernum,jdbcType=INTEGER}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>
